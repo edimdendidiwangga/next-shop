@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Product } from '../../types/types';
+import { Product, ProductUpdate } from '../../types/types';
 
 interface ProductsState {
   products: Product[];
@@ -17,26 +17,36 @@ export const productsSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
-    fetchProductsStart(state) {
-      state.loading = true;
-    },
-    fetchProductsSuccess(state, action: PayloadAction<Product[]>) {
+    fetchProducts: (state, action: PayloadAction<Product[]>) => {
       state.products = action.payload;
       state.loading = false;
       state.error = null;
     },
-    fetchProductsFailure(state, action: PayloadAction<string>) {
+    createProduct: (state, action: PayloadAction<Product>) => {
+      state.products = [...state.products, action.payload];
       state.loading = false;
+      state.error = null;
+    },
+    updateProduct: (state, action: PayloadAction<ProductUpdate>) => {
+      state.products = state.products.map((product) =>
+        product.id === action.payload.id? {...product,...action.payload } : product
+      );
+      state.loading = false;
+      state.error = null;
+    },
+    deleteProduct: (state, action: PayloadAction<string>) => {
+      state.products = state.products.filter((product) => product.id.toString() !== action.payload);
+      state.loading = false;
+      state.error = null;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
     },
   },
 });
 
-export const {
-  fetchProductsStart,
-  fetchProductsSuccess,
-  fetchProductsFailure
-} = productsSlice.actions;
-
+export const { fetchProducts, createProduct, updateProduct, deleteProduct, setLoading, setError } = productsSlice.actions;
 export default productsSlice.reducer;
-

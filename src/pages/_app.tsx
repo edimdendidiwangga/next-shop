@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux';
 import { AppProps } from 'next/app';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { store } from '../store/store';
+import store from '../store/store';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
