@@ -74,7 +74,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
     {
       id: 'actions',
       header: 'Actions',
-      cell: ({ row }: { row: Row<Product> }) => (
+      cell: ({ row }: { row: any }) => (
         <div className="flex items-center space-x-2">
           <Button
             onClick={() => handleUpdateProduct(row.original.id)}

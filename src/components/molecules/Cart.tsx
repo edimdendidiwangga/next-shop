@@ -10,7 +10,7 @@ const Cart = () => {
     const cartItems = useSelector((state: RootState) => state.cart.items);
     const dispatch = useDispatch();
 
-    const handleRemoveItem = (productId: number) => {
+    const handleRemoveItem = (productId: number | any) => {
         dispatch(removeItem(productId));
     };
 
@@ -31,9 +31,9 @@ const Cart = () => {
                 renderItem={item => (
                     <List.Item
                         actions={[
-                            <Button onClick={() => handleChangeQuantity(item, 1)} icon={<PlusOutlined />} />,
-                            <Button onClick={() => handleChangeQuantity(item, -1)} icon={<MinusOutlined />} disabled={item.quantity <= 1} />,
-                            <Button onClick={() => handleRemoveItem(item.product.id)} icon={<DeleteOutlined />} />
+                            <Button onClick={() => handleChangeQuantity(item, 1)} icon={<PlusOutlined />} key={item.product.id} />,
+                            <Button onClick={() => handleChangeQuantity(item, -1)} icon={<MinusOutlined />} disabled={item.quantity <= 1} key={item.product.id}/>,
+                            <Button onClick={() => handleRemoveItem(item.product.id)} icon={<DeleteOutlined />} key={item.product.id} />
                         ]}
                     >
                         <List.Item.Meta
