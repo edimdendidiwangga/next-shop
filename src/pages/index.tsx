@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useProducts } from '../hooks/productHooks';
 import Header from '../components/organisms/Header';
 import { ProductTable } from '../components/molecules/ProductTable';
+import Cart from '../components/molecules/Cart';
 
 export default function Home() {
   const [pageIndex, setPageIndex] = useState(0);
   const [searchTitle, setSearchTitle] = useState('');
-  const pageSize = 5; // Set the number of items per page
+  const pageSize = 5; 
 
   const { data: products, isLoading, error, isFetching } = useProducts({
     offset: pageIndex * pageSize,
@@ -15,20 +16,21 @@ export default function Home() {
   });
 
   const handlePreviousPage = () => {
-    setPageIndex(Math.max(0, pageIndex - 1)); // Prevent going below page 0
+    setPageIndex(Math.max(0, pageIndex - 1));
   };
 
   const handleNextPage = () => {
     if (products && products.length === pageSize) {
-      setPageIndex(pageIndex + 1); // Only allow next if a full page is filled
+      setPageIndex(pageIndex + 1); 
     }
   };
 
-  const safeProducts = products || []; // Ensure products is always an array
+  const safeProducts = products || [];
 
   return (
     <main>
       <Header />
+      <Cart />
       <div>
         <input
           type="text"
@@ -36,7 +38,7 @@ export default function Home() {
           value={searchTitle}
           onChange={(e) => {
             setSearchTitle(e.target.value);
-            setPageIndex(0); // Reset to the first page with new search
+            setPageIndex(0);
           }}
         />
       </div>

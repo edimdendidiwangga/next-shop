@@ -1,7 +1,10 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useReactTable, getCoreRowModel, flexRender, Row } from '@tanstack/react-table';
+import { Button, message, Tag } from 'antd';
 import { Product } from '@/types/types';
 import { useCreateProduct, useUpdateProduct, useDeleteProduct } from '../../hooks/productHooks';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../../reducer/slices/cartSlice';
 
 type ProductTableProps = {
   products: Product[];
@@ -10,6 +13,12 @@ type ProductTableProps = {
 export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const dispatch = useDispatch();
+
+  const handleAddToCart = (product: Product) => {
+    dispatch(addItem({ product, quantity: 1 }));
+    message.success('Product added to cart');
+  };
 
   const columns = useMemo(() => [
     { accessorKey: 'title', header: 'Title' },
@@ -32,10 +41,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
           <button onClick={() => deleteProduct.mutate(row.original.id)}>
             Delete
           </button>
+          <Button type="primary" onClick={() => handleAddToCart(row.original)}>
+            Add to Cart
+          </Button>
         </>
       )
     }
-  ], [updateProduct, deleteProduct]);
+  ], [updateProduct, deleteProduct, dispatch]);
 
   const table = useReactTable({
     data: products,
