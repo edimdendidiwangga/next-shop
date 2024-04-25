@@ -14,7 +14,12 @@ export const cartSlice = createSlice({
   initialState,
   reducers: {
     addItem: (state, action: PayloadAction<CartItem>) => {
-      state.items.push(action.payload);
+      const index = state.items.findIndex(item => item.product.id === action.payload.product.id);
+      if (index !== -1) {
+        state.items[index].quantity += action.payload.quantity;
+      } else {
+        state.items.push(action.payload);
+      }
     },
     updateItem: (state, action: PayloadAction<CartItem>) => {
       const index = state.items.findIndex(item => item.product.id === action.payload.product.id);
