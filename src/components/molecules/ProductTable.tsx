@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, flexRender, Row } from '@tanstack/react-table';
 import { Button, message } from 'antd';
 import { Product } from '@/types/types';
-import { useCreateProduct, useUpdateProduct, useDeleteProduct } from '../../hooks/productHooks';
+import { useUpdateProduct, useDeleteProduct } from '../../hooks/productHooks';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../reducer/slices/cartSlice';
 
@@ -25,6 +25,26 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
     setExpandedDesc(expandedDesc === productId ? null : productId);
   };
 
+  const getFirstImageUrl = (images: any) => {
+    if (!images || images.length === 0) return null;
+  
+    let firstImage = images[0];
+
+    if (typeof firstImage === 'string' && firstImage.startsWith('["')) {
+      try {
+        const parsedImages = JSON.parse(firstImage);
+        if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+          firstImage = parsedImages[0];
+        }
+      } catch (error) {
+        console.error('Failed to parse image URL:', error);
+      }
+    }
+    return firstImage;
+  }
+  
+  
+
   const columns = useMemo(() => [
     { accessorKey: 'title', header: 'Title' },
     { accessorKey: 'price', header: 'Price' },
@@ -45,11 +65,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
     {
       accessorKey: 'images',
       header: 'Images',
-      cell: (info: { getValue: () => string[] }) => (
+      cell: (info: { getValue: () => string[] }) => {
+        const safeImg = getFirstImageUrl(info.getValue())
+        return (
         <div className="relative w-16 h-16 overflow-hidden rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <img src={info.getValue()[0]} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform" />
+          <img src={safeImg} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform" />
         </div>
-      )
+      )}
     },
     {
       id: 'actions',

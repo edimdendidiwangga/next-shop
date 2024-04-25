@@ -1,12 +1,14 @@
-import { useQuery, useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../services/productService';
 import { useDispatch } from 'react-redux';
+import { message } from 'antd';
 import {
   fetchProducts as fetchProductsAction,
+  deleteProduct as deleteProductAction,
   setLoading,
   setError
 } from '../reducer/slices/productsSlice';
-import { Product, ProductUpdate } from '../types/types';
+import { Product, ProductUpdate, ProductCreate } from '../types/types';
 
 interface UseProductsArgs {  
   offset?: number;
@@ -36,14 +38,14 @@ export const useProducts = ({ offset, limit, title }: UseProductsArgs) => {
 export const useCreateProduct = () => {
   const dispatch = useDispatch();
 
-  return useMutation<Product, Error, Product>({
+  return useMutation<Product, Error, ProductCreate>({
     mutationFn: createProduct,
     onError: (error: Error) => {
-      console.error('Error creating product:', error.message);
+      message.error(`Error deleting product: ${error.message}`);
       dispatch(setError(error.message));
     },
     onSuccess: (data: Product) => {
-      console.log('Product created successfully:', data);
+      message.success('Product created successfully');
       dispatch(fetchProductsAction([data]));
     }
   });
@@ -54,23 +56,27 @@ export const useUpdateProduct = () => {
     mutationFn: (updatedProduct) => updateProduct(updatedProduct),
     onSuccess: (data) => {
       console.log('Product updated successfully:', data);
-      // Additional success logic here
+      message.success('Product updated successfully');
     },
     onError: (error: Error) => {
       console.error('Error updating product:', error.message);
+      message.error(`Error deleting product: ${error.message}`);
       // Additional error handling logic here
     }
   });
 };
 
 export const useDeleteProduct = () => {
+  const dispatch = useDispatch();
+
   return useMutation<void, Error, number>({
     mutationFn: deleteProduct,
     onSuccess: (_, productId) => {
-      console.log('Product deleted successfully, ID:', productId);
+      message.success(`Product deleted successfully, ID: ${productId}`);
+      dispatch(deleteProductAction(productId.toString())); 
     },
     onError: (error: Error, productId) => {
-      console.error('Error deleting product:', error.message, 'Product ID:', productId);
+      message.error(`Error deleting product:', ${error.message}, 'Product ID: ${productId}`);
     }
   });
 };

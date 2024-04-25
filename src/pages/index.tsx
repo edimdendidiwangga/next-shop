@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Button, Input } from 'antd';
+import { useRouter } from 'next/router';
 import { useProducts } from '../hooks/productHooks';
-import Header from '../components/organisms/Header';
 import { ProductTable } from '../components/molecules/ProductTable';
 import Cart from '../components/molecules/Cart';
+import { RootState } from '../store/store';
 
-export default function Home() {
+const ProductsPage: React.FC = () => {
   const [pageIndex, setPageIndex] = useState(0);
   const [searchTitle, setSearchTitle] = useState('');
-  const pageSize = 5; 
+  const pageSize = 5;
+  const router = useRouter();
+  const productsFromStore = useSelector((state: RootState) => state.products.products);
 
   const { data: products, isLoading, error, isFetching } = useProducts({
     offset: pageIndex * pageSize,
@@ -22,15 +26,16 @@ export default function Home() {
 
   const handleNextPage = () => {
     if (products && products.length === pageSize) {
-      setPageIndex(pageIndex + 1); 
+      setPageIndex(pageIndex + 1);
     }
   };
 
-  const safeProducts = products || [];
+  const handleCreateProduct = () => {
+    router.push('/create-product');
+  };
 
   return (
-    <main className="min-h-screen bg-gray-100">
-      <Header />
+    <main className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
         <Cart />
         <div className="mb-4">
@@ -45,19 +50,24 @@ export default function Home() {
             }}
           />
         </div>
+        <div className="mb-4">
+          <Button type="primary" onClick={handleCreateProduct}>
+            Create Product
+          </Button>
+        </div>
         {isLoading || isFetching ? (
           <div className="text-center">Loading...</div>
         ) : error ? (
           <div className="text-red-500 text-center">An error occurred: {error.message}</div>
         ) : (
           <>
-            <ProductTable products={safeProducts} />
+            <ProductTable products={productsFromStore} />
             <div className="pagination flex justify-between items-center mt-4">
               <Button type="primary" onClick={handlePreviousPage} disabled={pageIndex === 0}>
                 Previous
               </Button>
               <span>Page {pageIndex + 1}</span>
-              <Button type="primary" onClick={handleNextPage} disabled={safeProducts.length < pageSize}>
+              <Button type="primary" onClick={handleNextPage} disabled={productsFromStore.length < pageSize}>
                 Next
               </Button>
             </div>
@@ -66,4 +76,6 @@ export default function Home() {
       </div>
     </main>
   );
-}
+};
+
+export default ProductsPage;

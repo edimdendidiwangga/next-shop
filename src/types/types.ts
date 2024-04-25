@@ -5,6 +5,15 @@ export interface Product {
   price: number;
   description: string;
   categoryId: number;
+  images: string;
+}
+
+export interface ProductCreate {
+  id?: number;
+  title: string;
+  price: number;
+  description: string;
+  categoryId: number;
   images: string[];
 }
 
@@ -14,7 +23,7 @@ export interface ProductUpdate {
   price?: number;
   description?: string;
   categoryId?: number;
-  images?: string[];
+  images?: string;
 }
 
 // Defines the structure of a cart item, which includes the product and quantity.

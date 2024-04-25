@@ -1,4 +1,4 @@
-import { Product, ProductUpdate } from '../types/types';
+import { Product, ProductUpdate, ProductCreate } from '../types/types';
 import ApiService from './apiService';
 
 interface FetchProductsParams {
@@ -20,7 +20,17 @@ export const fetchProducts = async (params: FetchProductsParams): Promise<Produc
   }
 };
 
-export const createProduct = async (productData: Product): Promise<Product> => {
+export const fetchProductById = async (productId: number): Promise<Product> => {
+  try {
+    const response = await ApiService.get<Product>(`/products/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch product with ID ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const createProduct = async (productData: ProductCreate): Promise<Product> => {
   try {
     const response = await ApiService.post<Product>('/products', productData);
     return response.data;
