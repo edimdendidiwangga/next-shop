@@ -1,4 +1,4 @@
-import { Product, ProductUpdate, ProductCreate } from '../types/types';
+import { Product } from '../types/types';
 import ApiService from './apiService';
 
 interface FetchProductsParams {
@@ -30,7 +30,7 @@ export const fetchProductById = async (productId: number): Promise<Product> => {
   }
 };
 
-export const createProduct = async (productData: ProductCreate): Promise<Product> => {
+export const createProduct = async (productData: Product): Promise<Product> => {
   try {
     const response = await ApiService.post<Product>('/products', productData);
     return response.data;
@@ -40,7 +40,7 @@ export const createProduct = async (productData: ProductCreate): Promise<Product
   }
 };
 
-export const updateProduct = async (data: ProductUpdate): Promise<Product> => {
+export const updateProduct = async (data: Product): Promise<Product> => {
   try {
     const response = await ApiService.put(`/products/${data.id}`, data);
     return response.data;

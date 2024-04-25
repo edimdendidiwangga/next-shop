@@ -1,14 +1,15 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../services/productService';
+import { fetchProducts, fetchProductById, createProduct, updateProduct, deleteProduct } from '../services/productService';
 import { useDispatch } from 'react-redux';
 import { message } from 'antd';
 import {
   fetchProducts as fetchProductsAction,
+  fetchSingleProduct,
   deleteProduct as deleteProductAction,
   setLoading,
   setError
 } from '../reducer/slices/productsSlice';
-import { Product, ProductUpdate, ProductCreate } from '../types/types';
+import { Product } from '../types/types';
 
 interface UseProductsArgs {  
   offset?: number;
@@ -35,10 +36,29 @@ export const useProducts = ({ offset, limit, title }: UseProductsArgs) => {
   });
 };
 
+export const useSingleProduct = (productId: number) => {
+  const dispatch = useDispatch();
+
+  return useQuery<Product>({
+    queryKey: ['product'],
+    queryFn: async () => {
+      dispatch(setLoading(true));
+      try {
+        const data = await fetchProductById(productId);
+        dispatch(fetchSingleProduct(data)); 
+        return data;
+      } catch (error) {
+        dispatch(setError(error instanceof Error ? error.message : 'An unknown error occurred'));
+        throw new Error('Fetching failed');
+      }
+    }
+  });
+};
+
 export const useCreateProduct = () => {
   const dispatch = useDispatch();
 
-  return useMutation<Product, Error, ProductCreate>({
+  return useMutation<Product, Error, Product>({
     mutationFn: createProduct,
     onError: (error: Error) => {
       message.error(`Error deleting product: ${error.message}`);
@@ -52,7 +72,7 @@ export const useCreateProduct = () => {
 };
 
 export const useUpdateProduct = () => {
-  return useMutation<Product, Error, ProductUpdate>({
+  return useMutation<Product, Error, Product>({
     mutationFn: (updatedProduct) => updateProduct(updatedProduct),
     onSuccess: (data) => {
       console.log('Product updated successfully:', data);
@@ -61,7 +81,6 @@ export const useUpdateProduct = () => {
     onError: (error: Error) => {
       console.error('Error updating product:', error.message);
       message.error(`Error deleting product: ${error.message}`);
-      // Additional error handling logic here
     }
   });
 };

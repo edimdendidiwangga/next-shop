@@ -1,29 +1,17 @@
-// types.ts
-export interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  categoryId: number;
-  images: string;
-}
 
-export interface ProductCreate {
+export interface Product {
   id?: number;
   title: string;
   price: number;
   description: string;
-  categoryId: number;
-  images: string[];
-}
-
-export interface ProductUpdate {
-  id: number;
-  title?: string;
-  price?: number;
-  description?: string;
-  categoryId?: number;
-  images?: string;
+  images?: string[];
+  category?: {
+    id: number;
+    name: string;
+    image: string;
+    creationAt: string;
+    updatedAt: string;
+  };
 }
 
 // Defines the structure of a cart item, which includes the product and quantity.

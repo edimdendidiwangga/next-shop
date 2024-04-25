@@ -2,19 +2,22 @@ import React, { useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, flexRender, Row } from '@tanstack/react-table';
 import { Button, message } from 'antd';
 import { Product } from '@/types/types';
+import { useRouter } from 'next/router';
 import { useUpdateProduct, useDeleteProduct } from '../../hooks/productHooks';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../reducer/slices/cartSlice';
+import { getFirstImageUrl } from '../../utils/utils';
 
 type ProductTableProps = {
   products: Product[];
 };
 
 export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
-  const [expandedDesc, setExpandedDesc] = useState<number | null>(null);
+  const [expandedDesc, setExpandedDesc] = useState<number | null | undefined>(null);
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleAddToCart = (product: Product) => {
     dispatch(addItem({ product, quantity: 1 }));
@@ -22,28 +25,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   };
 
   const toggleDescription = (productId: number) => {
-    setExpandedDesc(expandedDesc === productId ? null : productId);
+    const isExpand = expandedDesc === productId ? null : productId
+    setExpandedDesc(isExpand);
   };
-
-  const getFirstImageUrl = (images: any) => {
-    if (!images || images.length === 0) return null;
   
-    let firstImage = images[0];
-
-    if (typeof firstImage === 'string' && firstImage.startsWith('["')) {
-      try {
-        const parsedImages = JSON.parse(firstImage);
-        if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-          firstImage = parsedImages[0];
-        }
-      } catch (error) {
-        console.error('Failed to parse image URL:', error);
-      }
-    }
-    return firstImage;
-  }
-  
-  
+  const handleUpdateProduct = (productId: number) => {
+    router.push(`/update-product/${productId}`);
+  };
 
   const columns = useMemo(() => [
     { accessorKey: 'title', header: 'Title' },
@@ -51,16 +39,26 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
     {
       accessorKey: 'description',
       header: 'Description',
-      cell: ({ row }: { row: Row<Product> }) => (
-        <>
-          {expandedDesc === row.original.id ?
-            row.original.description :
-            `${row.original.description.substring(0, 100)}...`}
-          <Button type="link" onClick={() => toggleDescription(row.original.id)}>
-            {expandedDesc === row.original.id ? 'Read Less' : 'Read More'}
-          </Button>
-        </>
-      )
+      cell: ({ row }: { row: Row<Product> }) => {
+        const { description, id } = row.original;
+        const isExpanded = expandedDesc === id;
+        const displayDescription = isExpanded ? description : `${description.substring(0, 50)}...`;
+    
+        const toggleDescription = () => {
+          setExpandedDesc(isExpanded ? null : id);
+        };
+    
+        return (
+          <div>
+            <span>{displayDescription}</span>
+            {description.length > 50 && (
+              <Button type="link" onClick={toggleDescription}>
+                {isExpanded ? 'Read Less' : 'Read More'}
+              </Button>
+            )}
+          </div>
+        );
+      }
     },
     {
       accessorKey: 'images',
@@ -79,7 +77,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
       cell: ({ row }: { row: Row<Product> }) => (
         <div className="flex items-center space-x-2">
           <Button
-            onClick={() => updateProduct.mutate({ id: row.original.id, price: row.original.price + 1 })}
+            onClick={() => handleUpdateProduct(row.original.id)}
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
             Update

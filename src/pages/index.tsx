@@ -4,7 +4,6 @@ import { Button, Input } from 'antd';
 import { useRouter } from 'next/router';
 import { useProducts } from '../hooks/productHooks';
 import { ProductTable } from '../components/molecules/ProductTable';
-import Cart from '../components/molecules/Cart';
 import { RootState } from '../store/store';
 
 const ProductsPage: React.FC = () => {
@@ -37,7 +36,6 @@ const ProductsPage: React.FC = () => {
   return (
     <main className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
-        <Cart />
         <div className="mb-4">
           <Input.Search
             placeholder="Search by title..."
